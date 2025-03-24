@@ -1,17 +1,21 @@
-
+Setup:
 install helm
 install k3d and docker
 install kubectl
 
-Kong install: 
+Kong install:
+```sh
 /kong-k8s/infra/kong-k8s/kong/kong.sh
+```
 
 Install Keycloak:
+```sh
 /kong-k8s/infra/kong-k8s/misc/keycloak/keycloak.sh
-
+```
 Install Prometheus:
+```sh
 ./kong-k8s/infra/kong-k8s/misc/prometheus/prometheus.sh
-
+```
 kubectl create ns bets:
 ```sh
 kubectl apply -f ./kong-k8s/infra/kong-k8s/misc/apps/ --recursive -n bets
@@ -94,3 +98,17 @@ Spectro validação do contrato da API (Design da API)
 Postman
 Github Pipeline (workflows com runset)
 https://github.com/rrddevops/kong-k8s/actions/runs/14021754244/job/39254628199
+
+Install ArgoCD:
+```sh
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+https://argo-cd.readthedocs.io/en/stable/getting_started/
+
+```sh
+kubectl exec -n argocd --stdin --tty argocd-server-68789d47c9-brs58 -- /bin/bash
+argocd admin initial-password -n argocd
+kubectl port-forward svc/argocd-server -n argocd 8081:443
+https://127.0.0.1:8081/applications
+```
