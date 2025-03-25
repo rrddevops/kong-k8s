@@ -109,6 +109,13 @@ https://argo-cd.readthedocs.io/en/stable/getting_started/
 ```sh
 kubectl exec -n argocd --stdin --tty argocd-server-68789d47c9-brs58 -- /bin/bash
 argocd admin initial-password -n argocd
+CUqJn09c5pKX5CcK
 kubectl port-forward svc/argocd-server -n argocd 8081:443
 https://127.0.0.1:8081/applications
 ```
+
+Adicionado apps argocd
+kubectl apply -f ./matches.yaml -n argocd
+kubectl apply -f ./players.yaml -n argocd
+kubectl apply -f ./championships.yaml -n argocd
+kubectl apply -f ./bets.yaml -n argoc

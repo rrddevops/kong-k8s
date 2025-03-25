@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     path: deployments/bets
-    repoURL: https://github.com/rrddevops/kong-k8s.git
+    repoURL: https://github.com/rrddevops/bets-api.git
     targetRevision: HEAD
     helm:
       valueFiles:
