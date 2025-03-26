@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     path: deployments/matches
-    repoURL: https://github.com/rrddevops/bets-api.git
+    repoURL: https://github.com/rrddevops/matches-api.git
     targetRevision: HEAD
     helm:
       valueFiles:

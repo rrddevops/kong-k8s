@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     path: deployments/championships
-    repoURL: https://github.com/rrddevops/bets-api.git
+    repoURL: https://github.com/rrddevops/championship-api.git
     targetRevision: HEAD
     helm:
       valueFiles:

@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     path: deployments/players
-    repoURL: https://github.com/rrddevops/bets-api.git
+    repoURL: https://github.com/rrddevops/players-api.git
     targetRevision: HEAD
     helm:
       valueFiles:
