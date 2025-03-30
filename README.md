@@ -40,6 +40,7 @@ kubectl apply -f ./kong-k8s/infra/kong-k8s/misc/apis/bets-api.yaml -n bets
 Expor o keycloak criar os usuarios para autenticação: 
 ```sh
 kubectl port-forward svc/keycloak 8080:80 -n iam
+user keycloak and password keycloak
 ```
 
 Criar um realm chamado bets no Keycloak e o usuário para autenticação;
