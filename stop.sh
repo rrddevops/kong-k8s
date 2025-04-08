@@ -19,6 +19,8 @@ helm uninstall kong  --namespace kong
 helm uninstall kibana --namespace logs
 helm uninstall fluentd --namespace logs
 helm uninstall elasticsearch --namespace logs
+helm uninstall metrics-server --namespace kube-system
+kind delete clusters kong-fc 
 
 kubectl get namespaces
 kubectl delete ns argocd bets kong iam logs monitoring

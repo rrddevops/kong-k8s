@@ -1,4 +1,9 @@
 #!/bin/bash
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm upgrade --install metrics-server metrics-server/metrics-server --namespace kube-system --set args={--kubelet-insecure-tls}
+kind create cluster --name kong-fc --config /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/kind/metrics-server/clusterconfig.yaml
+kubectl cluster-info --context kind-kong-fc
+
 kubectl create ns kong
 
 echo add kong
@@ -18,7 +23,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 helm install prometheus-stack prometheus-community/kube-prometheus-stack -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/prometheus/prometheus.yaml --namespace monitoring
 
-echo add bets
+echo add bet
 kubectl create ns bets
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apps/ --recursive -n bets
 

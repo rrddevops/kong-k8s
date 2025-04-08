@@ -1,0 +1,22 @@
+FROM kong:3.6
+
+USER root
+
+# Atualiza os pacotes e instala dependências necessárias
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    curl \
+    gcc \
+    g++ \
+    make \
+    libssl-dev \
+    libpcre3-dev \
+    zlib1g-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala o plugin kong-oidc diretamente do repositório oficial
+RUN luarocks install kong-oidc
+
+USER kong
