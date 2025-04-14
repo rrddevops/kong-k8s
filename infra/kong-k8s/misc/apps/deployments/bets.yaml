@@ -21,7 +21,7 @@ spec:
         language: golang
     spec:
       containers:
-        - image: rodrigordavila/bets:latest
+        - image: rodrigordavila/bets:kong
           imagePullPolicy: Always
           envFrom:
             - configMapRef:

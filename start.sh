@@ -4,9 +4,8 @@ helm upgrade --install metrics-server metrics-server/metrics-server --namespace 
 kind create cluster --name kong-fc --config /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/kind/metrics-server/clusterconfig.yaml
 kubectl cluster-info --context kind-kong-fc
 
-kubectl create ns kong
-
 echo add kong
+kubectl create ns kong
 helm repo add kong https://charts.konghq.com
 helm repo update
 helm install kong kong/kong -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/kong/kong-conf.yaml --set proxy.type=NodePort,proxy.http.nodePort=30000,proxy.tls.nodePort=30003 --set ingressController.installCRDs=false --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=promstack --namespace kong
@@ -28,8 +27,9 @@ kubectl create ns bets
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apps/ --recursive -n bets
 
 echo add kong api plugins
+#ou executar em /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apps/start.sh
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/kratelimit.yaml -n bets
-kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/kprometheus.yaml -n bets
+kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/kprometheus.yaml
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/king.yaml -n bets
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/bets-api.yaml -n bets
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/kopenid.yaml -n bets
