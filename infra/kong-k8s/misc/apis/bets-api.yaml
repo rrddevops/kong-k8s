@@ -6,6 +6,7 @@ metadata:
     kubernetes.io/ingress.class: "kong"
     konghq.com/override: do-not-preserve-host
     konghq.com/plugins: oidc-bets,rl-by-header,prometheus-bets
+    konghq.com/preserve-host: "false"
 spec:
   rules:
     - http:

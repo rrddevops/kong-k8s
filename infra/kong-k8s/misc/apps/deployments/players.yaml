@@ -21,7 +21,7 @@ spec:
         language: golang
     spec:
       containers:
-        - image: rodrigordavila/players:kong
+        - image: rodrigordavila/players:latest
           imagePullPolicy: Always
           resources:
             requests:

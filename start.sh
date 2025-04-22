@@ -1,4 +1,6 @@
 #!/bin/bash
+
+#Criando o cluster kind
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 helm upgrade --install metrics-server metrics-server/metrics-server --namespace kube-system --set args={--kubelet-insecure-tls}
 kind create cluster --name kong-fc --config /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/kind/metrics-server/clusterconfig.yaml
@@ -33,7 +35,6 @@ kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/kprome
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/king.yaml -n bets
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/bets-api.yaml -n bets
 kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/kopenid.yaml -n bets
-kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/bets-api.yaml -n bets
 
 echo add argocd
 kubectl create namespace argocd

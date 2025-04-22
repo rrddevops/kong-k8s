@@ -1,0 +1,118 @@
+Mudanças no projeto do Argocd HPA e Ingress:
+autoscaling/v2beta1 para apiVersion: autoscaling/v2
+networking.k8s.io/v1beta1  para  networking.k8s.io/v1
+
+Mudança no Ingress local: 
+C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apis - ingress e bets-api:
+konghq.com/preserve-host: "false" e retirei o route no king.yaml. 
+
+#Criar o cluster Kind
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\kind
+kind create cluster --name kong-fc --config clusterconfig.yaml
+kubectl cluster-info --context kind-kong-fc
+kubectl get pods -A
+
+#Implantação do Kong
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\kong
+kubectl create ns kong
+helm install kong kong/kong -f kong-conf.yaml --set proxy.type=NodePort,proxy.http.nodePort=30000,proxy.tls.nodePort=30003 --set ingressController.installCRDs=false --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=promstack --namespace kong
+
+#Instalação das ferramentas adicionais:
+
+#Protmetheus
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\prometheus
+kubectl create ns monitoring
+helm install prometheus-stack prometheus-community/kube-prometheus-stack -f prometheus.yaml --namespace monitoring
+
+#Keycloak - C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\keycloak
+kubectl create ns iam
+helm install keycloak bitnami/keycloak --set auth.adminUser=keycloak,auth.adminPassword=keycloak --namespace iam
+
+#para acompanhar o deploy no Windows
+while ($true) { kubectl get pods -A; Start-Sleep -Seconds 2; Clear-Host }
+
+#Instalação das APIs (sem uso do argocd)
+kubectl create ns bets
+kubectl apply -f C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apps --recursive -n bets
+#Ao subir o Argocd deletar essa configuração:
+kubectl delete -f C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apps --recursive -n bets
+
+#Instalação dos plugins no kong
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apis
+kubectl apply -f kprometheus.yaml
+kubectl apply -f kratelimit.yaml -n bets
+
+#Configurando o ingress
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apis
+kubectl apply -f bets-api.yaml -n bets
+kubectl apply -f king.yaml -n bets
+
+#chamar a requisição no postman: 
+kubectl logs -f kong-kong-7d698895f4-wzbkx proxy -n kong
+::1 - - [22/Apr/2025:00:56:14 +0000] "GET /status HTTP/1.1" 200 1724 "-" "Go-http-client/1.1"
+10.244.0.1 - - [22/Apr/2025:00:56:15 +0000] "POST /api/bets HTTP/1.1" 201 134 "-" "PostmanRuntime/7.43.3"
+::1 - - [22/Apr/2025:00:56:17 +0000] "GET /status HTTP/1.1" 200 1724 "-" "Go-http-client/1.1"
+10.244.0.1 - - [22/Apr/2025:00:56:19 +0000] "POST /api/bets HTTP/1.1" 201 134 "-" "PostmanRuntime/7.43.3"
+::1 - - [22/Apr/2025:00:56:20 +0000] "GET /status HTTP/1.1" 200 1724 "-" "Go-http-client/1.1"
+::1 - - [22/Apr/2025:00:56:23 +0000] "GET /status HTTP/1.1" 200 1724 "-" "Go-http-client/1.1"
+
+#Configurado o keycloak:
+kubectl port-forward svc/keycloak 8080:80 -n iam
+http://localhost:8080
+User: keycloak Senha: keycloak
+Add realm bets
+Authentication/required-actions disable all features
+Criar user (adicionar um email) e a senha não pode ser temporaria
+Add clients/add-client kong
+    Client authentication ON 
+    Valid redirect URIs *
+
+#Well Know chave publica
+http://localhost:8080/realms/bets/.well-known/openid-configuration
+
+#Subir quando configurar o keycloak - adicionar o secrets:
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apis
+kubectl apply -f kopenid.yaml -n bets
+
+#Para pegar o token precisaremos subir um pod, porque só será possivel dentro do cluster
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\token
+kubectl apply -f pod.yaml
+kubectl exec -it testcurl -- sh
+
+#para pegar o toke dentro do POD: 
+curl --location --request POST 'http://keycloak.iam/realms/bets/protocol/openid-connect/token' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'client_id=kong' \
+--data-urlencode 'grant_type=password' \
+--data-urlencode 'username=rodrigo' \
+--data-urlencode 'password=123456' \
+--data-urlencode 'client_secret=nUTC99vNMayintGX2lOPxeJ6Wij5X0GQ' \
+--data-urlencode 'scope=openid'
+
+#para testar a autenticação da API - Usar o postman: 
+curl --location 'http://localhost:80/api/bets' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer TOKEN' \
+--data-raw '{
+    "match": "1X-DC",
+    "email": "joe@doe.com",
+    "championship": "Uefa Champions League",
+    "awayTeamScore": "2",
+    "homeTeamScore": "3"
+}'
+
+#instalando o argo:
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+#obtendo a senha do argo e acessando a aplicação:
+#linux
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo
+#Windows
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}")))
+ZFFzpenjzWab2EuA
+kubectl port-forward svc/argocd-server 8081:80 -n argocd
+
+#implantando a aplicação via Argocd
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\argo-apps
+kubectl apply -f .\ --recursive -n argocd

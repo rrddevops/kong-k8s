@@ -19,8 +19,8 @@ Destino  - onde será criado a aplicação:
 As aplicações não podem ser iniciadas pelo repositorio.
 Encerre caso tenha criado manualmente: 
 /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apps/deployments
-Ex: kubectl delete -f /home/rodrigo/projetos/kong-k8s/infra/kong-k8s/misc/apis/bets-api.yaml -n bets
+Ex: kubectl delete -f infra/kong-k8s/misc/apis/bets-api.yaml -n bets
 
 #vamos iniciar as aplicações pelo argocd
-kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/argo-apps/players.yaml -n argocd
-kubectl apply -f /home/rodrigo/projetos/kong-k8s/infra/argo-apps/matches.yaml -n argocd
+kubectl apply -f infra/argo-apps/players.yaml -n argocd
+kubectl apply -f infra/argo-apps/matches.yaml -n argocd

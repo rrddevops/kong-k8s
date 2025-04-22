@@ -1,13 +1,6 @@
 apiVersion: configuration.konghq.com/v1
 kind: KongIngress
-#metadata:
-#  name: king-kongingress 
-#  namespace: bets
-#  annotations:
-#    konghq.com/preserve-host: "false"
 metadata:
   name: do-not-preserve-host
-#route:
-#  preserve_host: false
 upstream:
   host_header: bets.bets.svc

@@ -22,7 +22,7 @@ curl --location 'http://localhost:80/api/bets' \
 }'
 
 ###Log no kong - se tiver o openid connect atiado e passar o token ele não validará o token
-#kubectlogs -f kong-kong-7d698895f4-bms8f proxy -n kong
+#kubectl logs -f kong-kong-7d698895f4-bms8f proxy -n kong
 #10.244.0.1 - - [11/Apr/2025:21:24:29 +0000] "POST /api/bets HTTP/1.1" 201 134 "-" "curl/7.81.0"
 #####time="2025-04-11T21:16:59Z" level=error msg="failed to fetch KongPlugin resource" error="no KongPlugin or KongClusterPlugin was found for bets/oidc-bets" kongplugin_name=oidc-bets kongplugin_namespace=bets
 
