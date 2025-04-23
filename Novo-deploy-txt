@@ -4,7 +4,7 @@ networking.k8s.io/v1beta1  para  networking.k8s.io/v1
 
 Mudança no Ingress local: 
 C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apis - ingress e bets-api:
-konghq.com/preserve-host: "false" e retirei o route no king.yaml. 
+konghq.com/preserve-host: "false" e retirei o route no king.yaml
 
 #Criar o cluster Kind
 cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\kind
@@ -86,7 +86,7 @@ curl --location --request POST 'http://keycloak.iam/realms/bets/protocol/openid-
 --data-urlencode 'grant_type=password' \
 --data-urlencode 'username=rodrigo' \
 --data-urlencode 'password=123456' \
---data-urlencode 'client_secret=nUTC99vNMayintGX2lOPxeJ6Wij5X0GQ' \
+--data-urlencode 'client_secret=P0iy62vG42PNcl0EiDadYOdEfXiBzp60' \
 --data-urlencode 'scope=openid'
 
 #para testar a autenticação da API - Usar o postman: 
@@ -110,9 +110,38 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 --decode && echo
 #Windows
 [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}")))
-ZFFzpenjzWab2EuA
+d4cqaemEWTF1Si6Y
 kubectl port-forward svc/argocd-server 8081:80 -n argocd
 
 #implantando a aplicação via Argocd
 cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\argo-apps
 kubectl apply -f .\ --recursive -n argocd
+
+
+
+#Destruindo o ambiente
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\argo-apps
+kubectl delete -f  .\ --recursive -n argocd
+kubectl delete -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml -n argocd
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\token
+kubectl delete -f pod.yaml
+cd C:\Users\Rodrigo\projetos_github\kong-k8s\infra\kong-k8s\misc\apis
+kubectl delete -f  .\bets-api.yaml -n bets
+kubectl delete -f  .\king.yaml -n bets
+kubectl delete -f  .\kopenid.yaml-n bets
+kubectl delete -f  .\kprometheus.yaml
+kubectl delete -f  .\kratelimit.yamll -n bets
+
+helm list --all-namespaces
+helm uninstall kong  --namespace kong
+helm uninstall  keycloak --namespace iam
+helm uninstall  prometheus-stack --namespace monitoring
+
+kubectl delete ns bets
+kubectl delete ns argocd
+kubectl delete ns monitoring
+kubectl delete ns iam
+kubectl delete ns kong
+
+kind delete cluster --name kong-fc
+

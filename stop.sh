@@ -16,6 +16,8 @@ kubectl delete pods testcurl
 
 helm list --all-namespaces
 helm uninstall kong  --namespace kong
+helm uninstall  keycloak --namespace iam
+helm uninstall  prometheus-stack --namespace monitoring
 helm uninstall kibana --namespace logs
 helm uninstall fluentd --namespace logs
 helm uninstall elasticsearch --namespace logs
