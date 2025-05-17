@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gateway
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/finalize
+spec:
+  project: default
+  source:
+    path: deployments/gateway 
+    repoURL: https://github.com/rrddevops/gateway.git
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values-kong.yaml
+  destination:
+    namespace: vendas
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
